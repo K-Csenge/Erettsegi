@@ -49,44 +49,46 @@ namespace _2018_05_2
 
             #region 2. Feladat
 
-            //var legutolso = belepesek .Where(
-            //    j => 
-            //    j.ora == belepesek.Max(elem => elem.ora) && 
-            //    j.perc == belepesek.Max(elem => elem.perc)
-            //    ).LastOrDefault();
+            var legutolso = belepesek.Where(
+                j =>
+                j.ora == belepesek.Max(elem => elem.ora) &&
+                j.perc == belepesek.Max(elem => elem.perc) &&
+                j.irany == "ki").LastOrDefault();
 
-            //var legelso = belepesek.Where(
-            //    j =>
-            //    j.ora == belepesek.Min(elem => elem.ora) &&
-            //    j.perc == belepesek.Min(elem => elem.perc)
-            //    ).FirstOrDefault();
+            var ora = belepesek.Where(elem => 
+                elem.ora == belepesek.Min(elem => elem.ora));
+            
+            var perc = belepesek.Min(elem => elem.perc);
 
-            var legelso = new Belepes();
-            legelso.ora = 15;
-            legelso.perc = 60;
+            var legelso = belepesek.Where(
+                j =>
+                j.ora == ora &&
+                j.perc ==  perc &&
+                j.irany == "be");
 
-            var legutolso = new Belepes();
-            legutolso.ora = 0;
-            legutolso.perc = 0;
+            //var legelso = new Belepes();
+            //legelso.ora = 15;
+            //legelso.perc = 60;
 
-            for (int i = 0; i < belepesek.Count; i++)
-            {
-                if(belepesek[i].ora <= legelso.ora)
-                {
-                    if(belepesek [i].perc <= legelso.perc)
-                    {
-                        legelso = belepesek [i];
-                    }
-                }
+            //var legutolso = new Belepes();
+            //legutolso.ora = 0;
+            //legutolso.perc = 0;
 
-                if (belepesek[i].ora >= legutolso.ora)
-                {
-                    if (belepesek[i].perc >= legutolso.perc)
-                    {
-                        legutolso = belepesek[i];
-                    }
-                }
-            }
+            //for (int i = belepesek.Count -1; i >= 0 ; i--)
+            //{
+            //    if(belepesek[i].ora <= legelso.ora)
+            //    {
+            //        if(belepesek[i].perc <= legelso.perc)
+            //        {
+            //            if(belepesek[i].irany == "be")
+            //            {
+            //                legelso = belepesek[i];
+            //            }
+            //        }
+            //    }
+
+
+            //}
 
             var test = legelso;
             //Console.WriteLine($"Eloszor belepett ember id-je: {belepesek[0].id}, ora: {belepesek[0].ora}");
