@@ -74,7 +74,7 @@ namespace _2018_05_2
                     legutolso = belepesek[i];
                 }
             }
-
+            // Hello csenge
             Console.WriteLine($"Eloszor belepett ember id-je: {legelso.id}");
             Console.WriteLine($"Utoljara belepett ember id-je: {legutolso.id}");
             Console.WriteLine();
