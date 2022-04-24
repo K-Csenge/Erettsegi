@@ -8,146 +8,202 @@ namespace _2018_05_2
     internal class Program
     {
         public const string utvonal = "../../../ajto.txt";
+
+        #region Strukturak
+
         public struct Belepes
         {
             public int ora;
             public int perc;
             public int ido;
-            public int id;
             public string irany;
-            public int athaladas;
 
-            public Belepes(int ora, int perc, int id, string irany) : this()
+            public Belepes(int ora, int perc, string irany) : this()
             {
                 this.ora = ora;
                 this.perc = perc;
-                this.id = id;
                 this.irany = irany;
-                athaladas = 0;
                 ido = ora * 60 + perc;
+            }
+        }
+
+        public struct Jarkalo
+        {
+
+
+            public int id;
+            public List<Belepes> Logs;
+            public Jarkalo(int id) : this()
+            {
+                Logs = new List<Belepes>();
+                this.id = id;
+            }
+
+            public void AddBelepesToLogs(int ora, int perc, string irany)
+            {
+                Logs.Add(new Belepes(ora, perc, irany));
+            }
+            public Belepes FirstEnter()
+            {
+                var minIdo = Logs.Min(x => x.ido);
+                var result = Logs.Where(
+                j =>
+                j.ido == minIdo &&
+                j.irany == "be").FirstOrDefault();
+                return result;
+            }
+            public Belepes LastLeave()
+            {
+                var maxIdo = Logs.Max(x => x.ido);
+                var result = Logs.Where(
+                j =>
+                j.ido == maxIdo &&
+                j.irany == "ki").LastOrDefault();
+
+                return result;
+            }
+
+            public int Bentlet()
+            {
+                var bentlet = 0;
+                var kezdes = 0;
+                foreach (var log in Logs)
+                {
+                    if (log.irany == "be")
+                    {
+                        kezdes = log.ido;
+                    }
+                    else
+                    {
+                        bentlet += log.ido - kezdes;
+                        kezdes = 0;
+                    }
+                }
+
+                if (kezdes != 0)
+                {
+                    bentlet += 15 * 60 - kezdes;
+                }
+
+                return bentlet;
             }
 
         }
+
+        #endregion
 
         static void Main(string[] args)
         {
             #region 1. Feladat
 
-            var sorok = File.ReadLines(utvonal);
+            var sorok = File.ReadLines(utvonal).ToList();
+            var jarkalok = new List<Jarkalo>();
             var belepesek = new List<Belepes>();
-
-            foreach (var sor in sorok)
+            for (var i = 0; i < sorok.Count(); i++)
             {
-                var adatok = sor.Split(' ');
-                belepesek.Add(new Belepes(
-                    int.Parse(adatok[0]),
-                    int.Parse(adatok[1]),
-                    int.Parse(adatok[2]),
-                    adatok[3])
-                    );
-
+                var adatok = sorok[i].Split(' ');
+                belepesek.Add(new Belepes(int.Parse(adatok[0]),
+                                          int.Parse(adatok[1]),
+                                          adatok[3]));
+                var id = int.Parse(adatok[2]);
+                if (jarkalok.Any(x => x.id == id))
+                {
+                    jarkalok.Where(x => x.id == id).FirstOrDefault().AddBelepesToLogs(int.Parse(adatok[0]),
+                                                                                      int.Parse(adatok[1]),
+                                                                                      adatok[3]);
+                }
+                else
+                {
+                    jarkalok.Add(new Jarkalo(id));
+                    jarkalok.Where(x => x.id == id).FirstOrDefault().AddBelepesToLogs(int.Parse(adatok[0]),
+                                                                  int.Parse(adatok[1]),
+                                                                  adatok[3]);
+                }
             }
 
             #endregion
 
             #region 2. Feladat
 
-            Belepes legelso;
-            Belepes legutolso;
-            legelso.id = 0;
-            legutolso.id = 0;
-            legelso.ido = 15 * 60 + 60;
-            legutolso.ido = 0;
-
-            for (int i = belepesek.Count - 1; i >= 0; i--)
+            Belepes legelso = new(15, 60, "asf");
+            Belepes legutolso = new(0, 0, "asf");
+            var legelsoId = 0; 
+            var legutolsoId = 0; 
+            for (int i = 0; i < jarkalok.Count; i++)
             {
-                if (belepesek[i].ido <= legelso.ido && belepesek[i].irany == "be")
+                if(legelso.ido > jarkalok[i].FirstEnter().ido)
                 {
-                    legelso = belepesek[i];
+                    legelsoId = jarkalok[i].id;
+                    legelso = jarkalok[i].FirstEnter();
+                }
+
+                if (legutolso.ido < jarkalok[i].LastLeave().ido)
+                {
+                    legutolsoId = jarkalok[i].id;
+                    legutolso = jarkalok[i].LastLeave();
                 }
             }
 
-            for (int i = 0; i <= belepesek.Count - 1; i++)
+            #endregion
+
+            #region 3. Feladat, 4. Feladat
+
+            var sw = new StreamWriter("../../../athaladas.txt");
+            jarkalok.Sort((s1, s2) => s1.id.CompareTo(s2.id));
+            foreach (var jarkalo in jarkalok)
             {
-                if (belepesek[i].ido >= legutolso.ido && belepesek[i].irany == "ki")
+                sw.WriteLine($"{jarkalo.id} {jarkalo.Logs.Count}");
+                if(jarkalo.Logs.Count % 2 == 1)
                 {
-                    legutolso = belepesek[i];
+                    Console.Write($"{jarkalo.id} ");
                 }
             }
-            // Hello csenge
-            Console.WriteLine($"Eloszor belepett ember id-je: {legelso.id}");
-            Console.WriteLine($"Utoljara belepett ember id-je: {legutolso.id}");
+            sw.Close();
             Console.WriteLine();
 
             #endregion
 
-            #region 3. Feladat
+            #region 5. Feladat
 
-            int[] athaladasok = new int[101];
-            for(var i = 0; i < 101; i++)
+            var maxBentlevo = 0;
+            var bentlevok = 0;
+            var pillanatIdo = new Belepes(0,0,"asd");
+            foreach(var belepes in belepesek)
             {
-                athaladasok[i] = 0;
-            }
+                if (belepes.irany == "be")
+                    bentlevok++;
+                else
+                    bentlevok--;
 
-            for(int i = 0; i <= belepesek.Count - 1; i++)
-            {
-                athaladasok[belepesek[i].id]++;
-            }
-            
-            var athaladasokString = new List<string>();
-
-            for(int i = 0; i < 101; i++)
-            {
-                if(athaladasok[i] > 0)
+                if(bentlevok >= maxBentlevo)
                 {
-                    athaladasokString.Add($"{i} {athaladasok[i]}");
+                    maxBentlevo=bentlevok;
+                    pillanatIdo = belepes;
                 }
             }
+            Console.WriteLine($"A legtobben {pillanatIdo.ora}:{pillanatIdo.perc} oraakor voltak, {maxBentlevo}");
 
-            var sorok123 = File.ReadLines(utvonal);
-            File.WriteAllLines("../../../athaladasok.txt", athaladasokString);
-            
             #endregion
 
-            #region 4. Feladat
-            var bentmaradottak = new List<Belepes>();
+            #region 6. Feladat, 7. Feladat, 8. Feladat
 
-            //foreach (var belepes in belepesek)
-            //{
-            //    if (belepes.irany == "be")
-            //    {
-            //        bentmaradottak.Add(belepes);
-            //    }
-            //    else
-            //    {
-            //        if (bentmaradottak.Contains(belepes))
-            //        {
-            //            bentmaradottak.Remove(belepes);
-            //        }
-            //    }
-            //}
+            Console.Write("Kerem egy szemely azonositojat: ");
+            var azon = int.Parse(Console.ReadLine());
 
-            //int count = 0;
-            //for (int i = 0; i < belepesek.Count; i++)
-            //{
-            //    count = 0;
-            //    for (int j = 0; j < belepesek.Count; j++)
-            //    {
-            //        if (belepesek[i].id == belepesek[j].id)
-            //        {
-            //            //Console.WriteLine($"I: {i}, J: {j}, Egyformak, id: {belepesek[i].id}");
-            //            count++;
-            //        }
-            //    }
-            //    if (count % 2 != 0)
-            //    {
-            //        bentmaradottak.Add(belepesek[i]);
-            //        Console.WriteLine($"Id: {belepesek[i].id}, Megjeleness: {count}");
-            //    }
-            //}
-
-            //var rendezettBentmaradottak = bentmaradottak.OrderBy(jarkalo => jarkalo.id);
-
+            var tempJarkalo = jarkalok.Where(x => x.id == azon).FirstOrDefault();
+            foreach(var belepes in tempJarkalo.Logs)
+            {
+                if(belepes.irany == "be")
+                {
+                    Console.Write($"{belepes.ora}:{belepes.perc}-");
+                }
+                else
+                {
+                    Console.WriteLine($"{belepes.ora}:{belepes.perc}");
+                }
+            }
+            Console.WriteLine();
+            Console.WriteLine($"A(z) {azon} azonositoju szemely {tempJarkalo.Bentlet()} percet volt bent");
 
             #endregion
         }
