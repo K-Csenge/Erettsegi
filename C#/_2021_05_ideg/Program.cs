@@ -21,7 +21,8 @@ namespace _2021_05_ideg
         static void Main(string[] args)
         {
             Feladat1_Joshua();
-            Console.ReadKey();
+            Feladat2_Joshua();
+            Feladat3_Joshua();
         }
 
         #region Haver 
@@ -150,5 +151,36 @@ namespace _2021_05_ideg
                 Console.WriteLine();
             }
         }
+        static void Feladat2_Joshua()
+        {
+            Console.Write("Kerem a sor azonositot: ");
+            var sor = int.Parse(Console.ReadLine());
+            Console.Write("Kerem az oszlop azonositot: ");
+            var oszlop = int.Parse(Console.ReadLine());
+
+            Console.WriteLine($"A mert ertek: {to[sor - 1][oszlop - 1]} dm");
+        }
+        static void Feladat3_Joshua()
+        {
+            var felulet = 0;
+            var atlag = 0.0;
+
+            for (int i = 0; i < to.Count; i++)
+            {
+                for (int j = 0; j < to[i].Count; j++)
+                {
+                    if(to[i][j] > 0)
+                    {
+                        felulet++;
+                        atlag += to[i][j];
+                    }
+                }
+            }
+            atlag = Math.Round(atlag / (felulet * 10), 2);
+            //atlag = (atlag / 10) / felulet;
+            Console.WriteLine($"A felulete: {felulet} es az atlag melyseg: {atlag}");
+        }
+
+
     }
 }
