@@ -21,8 +21,12 @@ namespace _2021_05_ideg
         static void Main(string[] args)
         {
             Feladat1_Joshua();
-            Feladat2_Joshua();
-            Feladat3_Joshua();
+            //Feladat2_Joshua();
+            //Feladat3_Joshua();
+            //Feladat4_Joshua();
+            Feladat5_Joshua();
+            //Feladat6_Joshua();
+
         }
 
         #region Haver 
@@ -134,21 +138,23 @@ namespace _2021_05_ideg
                 foreach (var elem in elemek)
                 {
                     ideigList.Add(int.Parse(elem));
-                    //Console.Write($"{elem}\t");
                 }
                 to.Add(ideigList);
-                //Console.WriteLine();
             }
+            Matrix_Kiir();
 
-            // 2D tomb kiiratasa
-            for (int i = 0; i < to.Count; i++)
+            void Matrix_Kiir()
             {
-                var sor = to[i];
-                for (int j = 0; j < sor.Count; j++)
+                // 2D tomb kiiratasa
+                for (int i = 0; i < to.Count; i++)
                 {
-                    Console.Write($"{to[i][j]}\t");
+                    var sor = to[i];
+                    for (int j = 0; j < sor.Count; j++)
+                    {
+                        Console.Write($"{to[i][j]}\t");
+                    }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
             }
         }
         static void Feladat2_Joshua()
@@ -158,7 +164,22 @@ namespace _2021_05_ideg
             Console.Write("Kerem az oszlop azonositot: ");
             var oszlop = int.Parse(Console.ReadLine());
 
-            Console.WriteLine($"A mert ertek: {to[sor - 1][oszlop - 1]} dm");
+            //Console.WriteLine($"A mert ertek: {to[sor - 1][oszlop - 1]} dm");
+            For_Megold();
+
+            void For_Megold()
+            {
+                for (int i = 0; i < to.Count; i++)
+                {
+                    for (int j = 0; j < to[i].Count; j++)
+                    {
+                        if (i == sor && j == oszlop)
+                        {
+                            Console.WriteLine($"A mert ertek: {to[i][j]} dm");
+                        }
+                    }
+                }
+            }
         }
         static void Feladat3_Joshua()
         {
@@ -169,7 +190,7 @@ namespace _2021_05_ideg
             {
                 for (int j = 0; j < to[i].Count; j++)
                 {
-                    if(to[i][j] > 0)
+                    if (to[i][j] > 0)
                     {
                         felulet++;
                         atlag += to[i][j];
@@ -180,7 +201,100 @@ namespace _2021_05_ideg
             //atlag = (atlag / 10) / felulet;
             Console.WriteLine($"A felulete: {felulet} es az atlag melyseg: {atlag}");
         }
+        static void Feladat4_Joshua()
+        {
+            var maxMely = 0;
+            for (int i = 0; i < to.Count; i++)
+            {
+                for (int j = 0; j < to[i].Count; j++)
+                {
+                    if (to[i][j] >= maxMely)
+                    {
+                        maxMely = to[i][j];
+                    }
+                }
+            }
+            Console.WriteLine($"A tó legnagyobb mélysége: {maxMely} dm");
+            Console.Write($"A legmélyebb helyek sor - oszlop koordinátái:");
+            
+            for (int i = 0; i < to.Count; i++)
+            {
+                for (int j = 0; j < to[i].Count; j++)
+                {
+                    if (to[i][j] == maxMely)
+                    {
+                        Console.Write($" ({i + 1}; {j + 1}),");
+                    }
+                }
+            }
 
+            Console.WriteLine();
+        }
+        static void Feladat5_Joshua()
+        {
+            var kerulet = 0;
+            for (int i = 0; i < to.Count; i++)
+            {
+                for (int j = 0; j < to[i].Count; j++)
+                {
+                    var pont = to[i][j];
+
+                    if (pont != 0)
+                    {
+                        // Sorok ellenorzese ( i +- 1)
+                        if (i - 1 >= 0 && to[i - 1][j] == 0)
+                        {
+                            kerulet++;
+                        }
+                        if (i + 1 <= to.Count - 1 && to[i + 1][j] == 0)
+                        {
+                            kerulet++;
+                        }
+
+                        // Oszlopok ellenorzese ( i +- 1)
+                        if (j - 1 >= 0 && to[i][j - 1] == 0)
+                        {
+                            kerulet++;
+                        }                     
+                        if (j + 1 <= to[i].Count - 1 && to[i][j + 1] == 0)
+                        {
+                            kerulet++;
+                        }
+                       
+                    }
+                }
+            }
+            Console.WriteLine($" tó partvonala {kerulet} m hosszú");
+        }
+        static void Feladat6_Joshua()
+        {
+            Console.WriteLine("Kerek egy oszlop azonositot: ");
+            var oszlop = int.Parse(Console.ReadLine());
+            var szovegAFileba = new List<string>();
+
+            for (int i = 0; i < to.Count; i++)
+            {
+                var beirandoSor = "";
+                var melyseg = to[i][oszlop - 1];
+
+                if (i < 10)
+                {
+                    beirandoSor += "0" + (i + 1);
+                }
+                else
+                {
+                    beirandoSor += i + 1;
+                }
+                var csillagSzam = Math.Round((double)melyseg / 10);
+                for (int j = 0; j < csillagSzam; j++)
+                {
+                    beirandoSor += "*";
+                }
+                szovegAFileba.Add(beirandoSor);
+            }
+            File.WriteAllLines("../../../diagram.txt", szovegAFileba);
+
+        }
 
     }
 }
